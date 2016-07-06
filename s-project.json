@@ -1,5 +1,5 @@
 {
-  "name": "serverless-hipchat-connect",
+  "name": "serverless-hipchat-sns-cloudwatch-alarms",
   "custom": {
     "client": {
       "bucketName": "${name}-client.${stage}.${region}"

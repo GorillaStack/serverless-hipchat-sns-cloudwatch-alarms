@@ -8,4 +8,5 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - npm --version
           - npm install
+          - pushd restApi && npm install && popd
           - npm test
