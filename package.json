@@ -1,7 +1,7 @@
 {
-  "name": "serverless-hipchat-connect",
+  "name": "serverless-hipchat-sns-cloudwatch-alarms",
   "version": "0.0.1",
-  "description": "A Serverless Project and its Serverless Plugin dependencies.",
+  "description": "A Serverless HipChat connect plugin that manages CloudWatch alarms in SNS Queues",
   "author": {
     "name": "Elliott Spira",
     "email": "elliott@gorillastack.com"
