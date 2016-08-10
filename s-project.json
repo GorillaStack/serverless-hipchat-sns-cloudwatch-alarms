@@ -13,6 +13,7 @@
     }
   },
   "plugins": [
+    "serverless-plugin-sns",
     "serverless-optimizer-plugin",
     "serverless-offline",
     "serverless-client-s3"

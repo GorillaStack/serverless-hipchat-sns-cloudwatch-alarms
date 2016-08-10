@@ -1,7 +1,7 @@
 {
-  "key": "serverless-hipchat-boilerplate",
-  "name": "Serverless HipChat Boilerplate",
-  "description": "Serverless HipChat Boilerplate bot - brought to you by GorillaStack",
+  "key": "serverless-sns-cloudwatch-alarms",
+  "name": "SNS CloudWatch Alarms",
+  "description": "SNS CloudWatch Alarms - brought to you by GorillaStack",
   "vendor": {
     "name": "GorillaStack",
     "url": "http://www.gorillastack.com"
@@ -37,11 +37,23 @@
     "glance": [
       {
         "name": {
-          "value": "Hello!"
+          "value": "Application Alpha"
         },
-        "queryUrl": "${host}/glance-data",
-        "key": "sample.glance",
-        "target": "sample.sidebar",
+        "queryUrl": "${host}/glance-data?id=alpha",
+        "key": "glance.alpha",
+        "target": "sidebar.alpha",
+        "icon": {
+          "url": "${staticAssetsHost}/img/logo.png",
+          "url@2x": "${staticAssetsHost}/img/logo.png"
+        }
+      },
+      {
+        "name": {
+          "value": "Application Beta"
+        },
+        "queryUrl": "${host}/glance-data?id=beta",
+        "key": "glance.beta",
+        "target": "sidebar.beta",
         "icon": {
           "url": "${staticAssetsHost}/img/logo.png",
           "url@2x": "${staticAssetsHost}/img/logo.png"
@@ -50,9 +62,17 @@
     ],
     "webPanel": [
       {
-        "key": "sample.sidebar",
+        "key": "sidebar.alpha",
         "name": {
-          "value": "Hello Sidebar!"
+          "value": "Sidebar Alpha!"
+        },
+        "location": "hipchat.sidebar.right",
+        "url": "${staticAssetsHost}/sidebar.html"
+      },
+      {
+        "key": "sidebar.beta",
+        "name": {
+          "value": "Sidebar Beta!"
         },
         "location": "hipchat.sidebar.right",
         "url": "${staticAssetsHost}/sidebar.html"

@@ -48,12 +48,12 @@ exports.handler = function (event, context, cb) {
   let hipchat = new HipChatAPI(lib.dbManager, lib.logger);
 
   applyJWTValidationIfRequired(endpoint, event).then(
-    (oauthData) => callEndpointHandler(endpoint, [lib, hipchat, event, oauthData]).then(
-      (res) => cb(null, res),
-      (err) => handleError(err, cb)
+    oauthData => callEndpointHandler(endpoint, [lib, hipchat, event, oauthData]).then(
+      res => cb(null, res),
+      err => handleError(err, cb)
     ),
 
-    (err) => handleError(err, cb)
+    err => handleError(err, cb)
   );
 
 };

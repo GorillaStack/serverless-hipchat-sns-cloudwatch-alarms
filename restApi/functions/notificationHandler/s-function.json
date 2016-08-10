@@ -1,0 +1,30 @@
+{
+  "name": "notificationHandler",
+  "runtime": "nodejs4.3",
+  "description": "Serverless Lambda function for project: serverless-hipchat-sns-cloudwatch-alarms",
+  "customName": false,
+  "customRole": false,
+  "handler": "handler.handler",
+  "timeout": 6,
+  "memorySize": 1024,
+  "authorizer": {},
+  "custom": {
+    "excludePatterns": []
+  },
+  "endpoints": [],
+  "events": [],
+  "environment": {
+    "SERVERLESS_PROJECT": "${project}",
+    "SERVERLESS_STAGE": "${stage}",
+    "SERVERLESS_REGION": "${region}"
+  },
+  "sns": [
+    "arn:aws:sns:us-east-1:${awsAccount}:SampleTopic1",
+    "arn:aws:sns:us-east-1:${awsAccount}:SampleTopic2"
+  ],
+  "vpc": {
+    "securityGroupIds": [],
+    "subnetIds": []
+  }
+}
+t

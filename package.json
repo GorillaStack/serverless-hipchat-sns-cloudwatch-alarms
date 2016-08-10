@@ -24,6 +24,7 @@
     "serverless-client-s3": "^2.0.0",
     "serverless-offline": "^2.3.2",
     "serverless-optimizer-plugin": "^2.5.1",
+    "serverless-plugin-sns": "^0.5.11",
     "winston": "^2.2.0"
   },
   "devDependencies": {
