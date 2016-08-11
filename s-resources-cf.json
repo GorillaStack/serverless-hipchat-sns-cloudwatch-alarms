@@ -161,6 +161,12 @@
         ]
       }
     },
+    "awsAccountId": {
+      "Description": "AccountId for this AWS account",
+      "Value": {
+        "Ref": "AWS::AccountId"
+      }
+    },
     "InstallationTableName": {
       "Description": "Name of the InstallationTable created by CloudFormation",
       "Value": {
