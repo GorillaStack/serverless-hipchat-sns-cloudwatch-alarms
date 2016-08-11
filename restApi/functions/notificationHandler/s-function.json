@@ -16,11 +16,13 @@
   "environment": {
     "SERVERLESS_PROJECT": "${project}",
     "SERVERLESS_STAGE": "${stage}",
-    "SERVERLESS_REGION": "${region}"
+    "SERVERLESS_REGION": "${region}",
+    "INSTALLATION_TABLE": "${installationTableName}",
+    "ACCESS_TOKEN_TABLE": "${accessTokenTableName}"
   },
   "sns": [
-    "arn:aws:sns:us-east-1:${awsAccount}:SampleTopic1",
-    "arn:aws:sns:us-east-1:${awsAccount}:SampleTopic2"
+    "arn:aws:sns:us-east-1:${awsAccountId}:SampleTopic1",
+    "arn:aws:sns:us-east-1:${awsAccountId}:SampleTopic2"
   ],
   "vpc": {
     "securityGroupIds": [],

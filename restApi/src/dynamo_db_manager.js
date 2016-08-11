@@ -56,15 +56,17 @@ const getDbManager = (config, logger) => {
       let _this = this;
       return new Promise((resolve, reject) => {
         let query = {
-          TableName: tableName,
-          KeyConditionExpression: '#name = :value',
-          ExpressionAttributeNames: {
-            '#name': keyName
-          },
-          ExpressionAttributeValues: {
-            ':value': keyValue
-          }
+          TableName: tableName
         };
+        if (typeof keyName !== 'undefined' && typeof keyValue !== 'undefined') {
+          query.KeyConditionExpression = '#name = :value';
+          query.ExpressionAttributeNames = {
+            '#name': keyName
+          };
+          query.ExpressionAttributeValues = {
+            ':value': keyValue
+          };
+        }
         _this.dynamodb.query(query, (error, data) => {
           if (error) {
             logger.log('error', 'Error querying DynamoDB:', error);
