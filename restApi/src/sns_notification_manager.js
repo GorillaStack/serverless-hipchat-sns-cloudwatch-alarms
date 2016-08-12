@@ -7,6 +7,9 @@
 
 import co from 'co';
 import { getGlanceFormattedTopicGroupState } from './topic_group_manager';
+import { HipChatAPI } from './hipchat_api';
+
+const GLANCE_PREFIX = 'glance.';
 
 const notificationHandler = (lib, notification) => {
   const alarm = JSON.parse(notification.Message);
@@ -16,15 +19,16 @@ const notificationHandler = (lib, notification) => {
   lib.logger.debug('Topic Groups to update: ', { topicGroups: topicGroups });
   const currentState = getAlarmState(alarm);
   return co(function*() {
-    const queryResult = yield lib.dbManager.query(process.env.INSTALLATION_TABLE);
+    const queryResult = yield lib.dbManager.scan(process.env.INSTALLATION_TABLE);
     const installations = queryResult.Items;
-    lib.logger.debug('installations: ', installations);
-
-    // let hipchat = new HipChatAPI(lib.dbManager, lib.logger);
-    // topicGroups.forEach(topicGroup => {
-    //   const glanceData = getGlanceFormattedTopicGroupState(lib, topicGroup, currentState);
-    //   yield hipchat.updateGlanceData(oauthId, roomId, 'glance.' + topicGroup, glanceData);
-    // });
+    for (const installation of installations) {
+      let hipchat = new HipChatAPI(lib.dbManager, lib.logger);
+      for (const topicGroup of topicGroups) {
+        const glanceData = getGlanceFormattedTopicGroupState(lib, topicGroup, currentState);
+        const glanceKey = GLANCE_PREFIX.concat(topicGroup);
+        yield hipchat.updateGlanceData(installation.oauthId, installation.roomId, glanceKey, glanceData);
+      }
+    }
   });
 };
 
