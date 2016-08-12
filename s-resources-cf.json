@@ -95,6 +95,25 @@
                       }
                     ]
                   ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:dynamodb:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":table/",
+                      {
+                        "Ref": "CloudWatchAlarmTable"
+                      }
+                    ]
+                  ]
                 }
               ]
             }
@@ -149,6 +168,36 @@
           "WriteCapacityUnits": 1
         }
       }
+    },
+    "CloudWatchAlarmTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DependsOn": "DynamoDBAccessTokenTable",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "alarmName",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "topicGroupKey",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "topicGroupKey",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "alarmName",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 3,
+          "WriteCapacityUnits": 1
+        }
+      }
     }
   },
   "Outputs": {
@@ -177,6 +226,12 @@
       "Description": "Name of the AccessTokenTable created by CloudFormation",
       "Value": {
         "Ref": "DynamoDBAccessTokenTable"
+      }
+    },
+    "CloudWatchAlarmTableName": {
+      "Description": "Name of the CloudWatchAlarmTable created by CloudFormation",
+      "Value": {
+        "Ref": "CloudWatchAlarmTable"
       }
     }
   }

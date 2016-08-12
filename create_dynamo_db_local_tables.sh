@@ -20,17 +20,22 @@ REGION_MISSING_DASHES=`echo $REGION | tr -d '-'`
 VARIABLE_FILE="./_meta/variables/s-variables-dev-${REGION_MISSING_DASHES}.json"
 INSTALLATION_TABLE=`node -pe 'JSON.parse(process.argv[1]).installationTableName' "$(cat ${VARIABLE_FILE})"`
 ACCESS_TOKEN_TABLE=`node -pe 'JSON.parse(process.argv[1]).accessTokenTableName' "$(cat ${VARIABLE_FILE})"`
+CLOUD_WATCH_ALARM_TABLE=`node -pe 'JSON.parse(process.argv[1]).cloudWatchAlarmTableName' "$(cat ${VARIABLE_FILE})"`
 
 if [[ -z $INSTALLATION_TABLE || -z $ACCESS_TOKEN_TABLE ]]; then
-  echo "No INSTALLATION_TABLE or ACCESS_TOKEN_TABLE found in _meta/variables for region $REGION.  Exiting..."
+  echo "No INSTALLATION_TABLE, ACCESS_TOKEN_TABLE, CLOUD_WATCH_ALARM_TABLE found in _meta/variables for region $REGION.  Exiting..."
   exit 1
 fi
 
 echo INSTALLATION_TABLE=$INSTALLATION_TABLE
 echo ACCESS_TOKEN_TABLE=$ACCESS_TOKEN_TABLE
+echo CLOUD_WATCH_ALARM_TABLE=$CLOUD_WATCH_ALARM_TABLE
 
 # Create the InstallationTable
 aws dynamodb create-table --table-name $INSTALLATION_TABLE --attribute-definitions AttributeName="oauthId",AttributeType="S" --key-schema AttributeName="oauthId",KeyType="HASH" --provisioned-throughput ReadCapacityUnits=3,WriteCapacityUnits=1 --region $REGION --endpoint-url http://localhost:8000
 
 # Create the AccessTokenTable
 aws dynamodb create-table --table-name $ACCESS_TOKEN_TABLE --attribute-definitions AttributeName="oauthId",AttributeType="S" --key-schema AttributeName="oauthId",KeyType="HASH" --provisioned-throughput ReadCapacityUnits=3,WriteCapacityUnits=1 --region $REGION --endpoint-url http://localhost:8000
+
+# Create the CloudWatchAlarmTable
+aws dynamodb create-table --table-name $CLOUD_WATCH_ALARM_TABLE --attribute-definitions AttributeName="alarmName",AttributeType="S" AttributeName="topicGroupKey",AttributeType="S" --key-schema AttributeName="topicGroupKey",KeyType="HASH" AttributeName="alarmName",KeyType="RANGE" --provisioned-throughput ReadCapacityUnits=3,WriteCapacityUnits=1 --region $REGION --endpoint-url http://localhost:8000
