@@ -6,6 +6,11 @@
 *   2. format topic group data for glances in the hipchat connect api
 *   3. format topic group data for sidebar for individual glances
 */
+
+const ALARM_STATE = 'ALARM';
+const INSUFFICIENT_DATA_STATE = 'INSUFFICIENT_DATA';
+const OK_STATE = 'OK';
+
 const LOZENGES = {
   OK: {
     type: 'lozenge',
@@ -23,7 +28,7 @@ const LOZENGES = {
     }
   },
 
-  ERROR: {
+  ALARM: {
     type: 'lozenge',
     value: {
       label: 'Error',
@@ -60,4 +65,29 @@ const getGlanceFormattedTopicGroupState = (lib, topicGroup, state) => {
   return glanceData;
 };
 
-export { setTopicData, getTopicData, getGlanceFormattedTopicGroupState };
+const getTopicGroupState = (lib, topicGroupKey) => {
+  return new Promise((resolve, reject) => {
+    lib.dbManager.query(process.env.ALARM_TABLE, 'topicGroupKey', topicGroupKey)
+      .then(
+        res => {
+          lib.logger.debug('Received results for getTopicGroupState', { results: res });
+          const someError = res.Items.every(item => item.alarm.NewStateValue === ALARM_STATE);
+          const someInsufficientData = res.Items.every(item => item.alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
+          if (someError) {
+            resolve(ALARM_STATE)
+          } else if (someInsufficientData) {
+            resolve(INSUFFICIENT_DATA_STATE)
+          } else {
+            resolve(OK_STATE)
+          }
+        },
+
+        err => {
+          lib.logger.error('getTopicGroupState received error', { err: err.toString(), stack: err.stack });
+          reject(err);
+        }
+      );
+  });
+};
+
+export { setTopicData, getTopicData, getGlanceFormattedTopicGroupState, getTopicGroupState };

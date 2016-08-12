@@ -6,7 +6,7 @@
 */
 
 import co from 'co';
-import { getGlanceFormattedTopicGroupState } from './topic_group_manager';
+import { getGlanceFormattedTopicGroupState, getTopicGroupState } from './topic_group_manager';
 import { HipChatAPI } from './hipchat_api';
 
 const GLANCE_PREFIX = 'glance.';
@@ -19,11 +19,13 @@ const notificationHandler = (lib, notification) => {
   lib.logger.debug('Topic Groups to update: ', { topicGroups: topicGroups });
   const currentState = getAlarmState(alarm);
   return co(function*() {
+    yield storeAlarmState(lib, topicGroups, alarm);
     const queryResult = yield lib.dbManager.scan(process.env.INSTALLATION_TABLE);
     const installations = queryResult.Items;
     for (const installation of installations) {
       let hipchat = new HipChatAPI(lib.dbManager, lib.logger);
       for (const topicGroup of topicGroups) {
+        const currentState = yield getTopicGroupState(lib, topicGroup);
         const glanceData = getGlanceFormattedTopicGroupState(lib, topicGroup, currentState);
         const glanceKey = GLANCE_PREFIX.concat(topicGroup);
         yield hipchat.updateGlanceData(installation.oauthId, installation.roomId, glanceKey, glanceData);
@@ -43,5 +45,24 @@ const getTopicGroupsToUpdate = (topicName, topicGroups) => {
 };
 
 const getAlarmState = alarm => alarm.NewStateValue;
+
+/**
+* storeAlarmState
+*
+* Store the alarm for each topic group.
+* Even if duplicates, this accomodates scenarios where one alarm publishes multiple
+* topics.
+*/
+const storeAlarmState = (lib, topicGroups, alarm) => {
+  return co(function*() {
+    for (const topicGroupKey of topicGroups) {
+      yield lib.dbManager.put(process.env.ALARM_TABLE, {
+        alarmName: alarm.AlarmName,
+        topicGroupKey: topicGroupKey,
+        alarm: alarm
+      });
+    }
+  });
+};
 
 export { notificationHandler, getTopicNameFromNotification, getTopicGroupsToUpdate };
