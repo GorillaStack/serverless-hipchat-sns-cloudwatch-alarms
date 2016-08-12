@@ -11,7 +11,33 @@
   "custom": {
     "excludePatterns": []
   },
-  "endpoints": [],
+  "endpoints": [{
+    "path": "notificationHandler",
+    "method": "POST",
+    "type": "AWS",
+    "authorizationType": "none",
+    "authorizerFunction": false,
+    "apiKeyRequired": false,
+    "requestParameters": {},
+    "requestTemplates": {
+      "application/json": "$${defaultEndpoint}"
+    },
+    "responses": {
+      "400": {
+        "statusCode": "400"
+      },
+      "default": {
+        "statusCode": "204",
+        "responseParameters": {},
+        "responseModels": {
+          "application/json;charset=UTF-8": "Empty"
+        },
+        "responseTemplates": {
+          "application/json;charset=UTF-8": ""
+        }
+      }
+    }
+  }],
   "events": [],
   "environment": {
     "SERVERLESS_PROJECT": "${project}",
