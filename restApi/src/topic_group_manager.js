@@ -7,6 +7,7 @@
 *   3. format topic group data for sidebar for individual glances
 */
 
+const EMPTY_STATE = 'EMPTY';
 const ALARM_STATE = 'ALARM';
 const INSUFFICIENT_DATA_STATE = 'INSUFFICIENT_DATA';
 const OK_STATE = 'OK';
@@ -33,6 +34,14 @@ const LOZENGES = {
     value: {
       label: 'Error',
       type: 'error'
+    }
+  },
+
+  EMPTY: {
+    type: 'lozenge',
+    value: {
+      label: 'No Data',
+      type: 'default'
     }
   }
 };
@@ -73,7 +82,9 @@ const getTopicGroupState = (lib, topicGroupKey) => {
           lib.logger.debug('Received results for getTopicGroupState', { results: res });
           const someError = res.Items.every(item => item.alarm.NewStateValue === ALARM_STATE);
           const someInsufficientData = res.Items.every(item => item.alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
-          if (someError) {
+          if (res.Count === 0) {
+            resolve(EMPTY_STATE);
+          } else if (someError) {
             resolve(ALARM_STATE);
           } else if (someInsufficientData) {
             resolve(INSUFFICIENT_DATA_STATE);
