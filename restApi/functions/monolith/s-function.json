@@ -253,7 +253,8 @@
     "SERVERLESS_STAGE": "${stage}",
     "SERVERLESS_REGION": "${region}",
     "INSTALLATION_TABLE": "${installationTableName}",
-    "ACCESS_TOKEN_TABLE": "${accessTokenTableName}"
+    "ACCESS_TOKEN_TABLE": "${accessTokenTableName}",
+    "ALARM_TABLE": "${cloudWatchAlarmTableName}"
   },
   "vpc": {
     "securityGroupIds": [],

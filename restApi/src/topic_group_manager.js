@@ -74,11 +74,11 @@ const getTopicGroupState = (lib, topicGroupKey) => {
           const someError = res.Items.every(item => item.alarm.NewStateValue === ALARM_STATE);
           const someInsufficientData = res.Items.every(item => item.alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
           if (someError) {
-            resolve(ALARM_STATE)
+            resolve(ALARM_STATE);
           } else if (someInsufficientData) {
-            resolve(INSUFFICIENT_DATA_STATE)
+            resolve(INSUFFICIENT_DATA_STATE);
           } else {
-            resolve(OK_STATE)
+            resolve(OK_STATE);
           }
         },
 
