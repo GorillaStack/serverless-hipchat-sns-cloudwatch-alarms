@@ -48,7 +48,7 @@ class ListItem extends React.Component {
 
   render() {
     return (
-      <li className="aui-connect-list-item">
+      <li className="aui-connect-list-item" onClick={this.props.onclick}>
         { this.getActionsIfAny() }
         <span className="aui-avatar aui-avatar-medium">
           <span className="aui-avatar-inner">
@@ -83,6 +83,7 @@ class TopicList extends React.Component {
         index={index}
         title={topic.title}
         actions={topic.actions}
+        onclick={() => { this.props.selectTopic(topic.title) }}
         secondaryText={[
           <span className={this.getLozengeClassNameForStatus(topic.status)}>{topic.status}</span>,
           '#alerts: ' + topic.alerts.length
@@ -98,12 +99,76 @@ class TopicList extends React.Component {
   }
 }
 
-class Sidebar extends React.Component {
+class AlertList extends React.Component {
   render() {
+    const alertList = this.props.alerts.map((topic, index) => (
+      <ListItem
+        key={index}
+        index={index}
+        title={topic.title}
+        actions={topic.actions}
+        secondaryText={[
+          '#alerts: ' + topic.alerts.length
+        ]}
+      />));
+    return (
+      <section className="aui-connect-content with-list">
+        <ol className="aui-connect-list">
+          <a className="aui-connect-back" onClick={this.props.back}>Back</a>
+          {alertList}
+        </ol>
+      </section>
+    );
+  }
+}
+
+class Sidebar extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      topicName: null,
+      alertName: null
+    };
+
+    this.setTopicName = this.setTopicName.bind(this);
+    this.unsetTopicName = this.unsetTopicName.bind(this);
+    this.unsetAlertName = this.unsetAlertName.bind(this);
+  }
+
+  setTopicName(topicName) {
+    this.setState({ topicName: topicName });
+  }
+
+  unsetTopicName() {
+    this.setState({ topicName: null });
+  }
+
+  unsetAlertName() {
+    this.setState({ alertName: null });
+  }
+
+  getTopicList() {
     return (
       <section className="aui-connect-page" role="main">
-        <TopicList topics={topics} />
+        <TopicList topics={topics} selectTopic={this.setTopicName} />
       </section>);
+  }
+
+  getAlertList(topicName) {
+    return (
+      <section className="aui-connect-page" role="main">
+        <AlertList alerts={[]} back={this.unsetTopicName} />
+      </section>);
+  }
+
+  render() {
+    const topicName = this.state.topicName;
+    console.log('state: ', this.state);
+    if (topicName) {
+      return this.getAlertList(topicName);
+    } else {
+      return this.getTopicList();
+    }
   }
 }
 
