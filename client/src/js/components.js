@@ -1,13 +1,13 @@
 
-const ListItem = React.createClass({
-  hasActions: function() {
+class ListItem extends React.Component {
+  hasActions() {
     return (
       typeof this.props.actions !== 'undefined'
       && this.props.actions.length > 0
     );
-  },
+  }
 
-  getActionsIfAny: function() {
+  getActionsIfAny() {
     if (this.hasActions()) {
       const key = this.props.index;
       const actions = this.props.actions.map((action, index) =>
@@ -27,13 +27,13 @@ const ListItem = React.createClass({
         </div>
       );
     }
-  },
+  }
 
-  hasSecondaryText: function() {
+  hasSecondaryText() {
     return this.props.secondaryText && this.props.secondaryText.length > 0;
-  },
+  }
 
-  getSecondaryTextIfAny: function() {
+  getSecondaryTextIfAny() {
     if (this.hasSecondaryText()) {
       const secondaryText = this.props.secondaryText.map((body, index) =>
         (<li key={index}>{body}</li>));
@@ -44,9 +44,9 @@ const ListItem = React.createClass({
         </ul>
       );
     }
-  },
+  }
 
-  render: function() {
+  render() {
     return (
       <li className="aui-connect-list-item">
         { this.getActionsIfAny() }
@@ -60,11 +60,10 @@ const ListItem = React.createClass({
       </li>
     );
   }
+}
 
-});
-
-const TopicList = React.createClass({
-  getLozengeClassNameForStatus: function(status) {
+class TopicList extends React.Component {
+  getLozengeClassNameForStatus(status) {
     let className = 'aui-lozenge ';
     if (status === 'OK') {
       className += 'aui-lozenge-success';
@@ -75,9 +74,9 @@ const TopicList = React.createClass({
     }
 
     return className;
-  },
+  }
 
-  render: function() {
+  render() {
     const topicList = this.props.topics.map((topic, index) => (
       <ListItem
         key={index}
@@ -97,16 +96,16 @@ const TopicList = React.createClass({
       </section>
     );
   }
-});
+}
 
-const Sidebar = React.createClass({
-  render: function() {
+class Sidebar extends React.Component {
+  render() {
     return (
       <section className="aui-connect-page" role="main">
         <TopicList topics={topics} />
       </section>);
   }
-});
+}
 
 const topics = [
   { title: 'Topic 1', alerts: [{}, {}], status: 'OK' },
