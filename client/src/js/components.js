@@ -9,16 +9,17 @@ const ListItem = React.createClass({
 
   getActionsIfAny: function() {
     if (this.hasActions()) {
+      const key = this.props.index;
       const actions = this.props.actions.map((action, index) =>
         <li key={index}><a href="{action.href}">{action.text}</a></li>);
 
       return (
         <div className="aui-connect-list-item-actions">
-          <button className="aui-dropdown2-trigger aui-button aui-dropdown2-trigger-arrowless" aria-owns="list-item-1"
-              aria-haspopup="true" id="list-item-1-action-menu" data-no-focus="true">
+          <button className="aui-dropdown2-trigger aui-button aui-dropdown2-trigger-arrowless" aria-owns={'list-item-' + key}
+              aria-haspopup="true" id={'list-item-' + key + '-action-menu'} data-no-focus="true">
             <span className="aui-icon aui-icon-small aui-iconfont-more"></span>
           </button>
-          <div id="list-item-1" className="aui-style-default aui-dropdown2 aui-connect-list-item-action">
+          <div id={'list-item-' + key} className="aui-style-default aui-dropdown2 aui-connect-list-item-action">
             <ul className="aui-list-truncate">
               {actions}
             </ul>
@@ -34,8 +35,8 @@ const ListItem = React.createClass({
 
   getSecondaryTextIfAny: function() {
     if (this.hasSecondaryText()) {
-      const secondaryText = this.props.secondaryText.map(body =>
-        (<li key={body}>{body}</li>));
+      const secondaryText = this.props.secondaryText.map((body, index) =>
+        (<li key={index}>{body}</li>));
 
       return (
         <ul className="aui-connect-list-item-attributes">
@@ -77,9 +78,10 @@ const TopicList = React.createClass({
   },
 
   render: function() {
-    const topicList = this.props.topics.map(topic => (
+    const topicList = this.props.topics.map((topic, index) => (
       <ListItem
-        key={topic.title}
+        key={index}
+        index={index}
         title={topic.title}
         actions={topic.actions}
         secondaryText={[
