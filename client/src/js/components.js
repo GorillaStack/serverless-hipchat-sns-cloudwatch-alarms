@@ -1,3 +1,19 @@
+class LoadingListItem extends React.Component {
+  componentDidMount() {
+    $(".spinner").spin();
+  }
+
+  render() {
+    return (
+      <li className="aui-connect-list-item">
+        <span className="aui-avatar aui-avatar-medium">
+          <div className="spinner" style={{margin: "10px"}}></div>
+        </span>
+        <span className="aui-connect-list-item-title">Loading latest data...</span>
+      </li>
+    );
+  }
+}
 
 class ListItem extends React.Component {
   hasActions() {
@@ -47,8 +63,10 @@ class ListItem extends React.Component {
   }
 
   render() {
+    const isClickable = typeof this.props.onclick === 'function';
+    const onclick = this.props.onclick || () => {};
     return (
-      <li className="aui-connect-list-item" onClick={this.props.onclick}>
+      <li className={isClickable ? 'clickable-list-item aui-connect-list-item' : 'aui-connect-list-item'} onClick={onclick}>
         { this.getActionsIfAny() }
         <span className="aui-avatar aui-avatar-medium">
           <span className="aui-avatar-inner">
@@ -77,6 +95,7 @@ class TopicList extends React.Component {
   }
 
   render() {
+    const loadingListItem = this.props.loading ? <LoadingListItem /> : undefined;
     const topicList = this.props.topics.map((topic, index) => (
       <ListItem
         key={index}
@@ -92,6 +111,7 @@ class TopicList extends React.Component {
     return (
       <section className="aui-connect-content with-list">
         <ol className="aui-connect-list">
+          {loadingListItem}
           {topicList}
         </ol>
       </section>
@@ -113,8 +133,8 @@ class AlertList extends React.Component {
       />));
     return (
       <section className="aui-connect-content with-list">
+        <a className="aui-connect-back" onClick={this.props.back}>Back</a>
         <ol className="aui-connect-list">
-          <a className="aui-connect-back" onClick={this.props.back}>Back</a>
           {alertList}
         </ol>
       </section>
@@ -126,6 +146,8 @@ class Sidebar extends React.Component {
   constructor() {
     super();
     this.state = {
+      topics: [],
+      loading: false,
       topicName: null,
       alertName: null
     };
@@ -147,25 +169,99 @@ class Sidebar extends React.Component {
     this.setState({ alertName: null });
   }
 
+  getData() {
+    this.setState({ loading: true });
+    HipChat.auth.withToken((err, token) => {
+      this.dataRequest = $.ajax({
+        type: 'GET',
+        url: '${host}/topics',
+        headers: { authorization: 'JWT ' + token },
+        crossDomain: true,
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(data) {
+          this.setState({ loading: false, topics: data });
+        }.bind(this),
+        error: function (response, jqXHR, status) {
+          this.setState({ loading: false });
+          if (response.status !== 200) {
+            alert('fail' + status.code);
+          }
+        }.bind(this)
+      });
+    });
+
+  }
+
   getTopicList() {
     return (
       <section className="aui-connect-page" role="main">
-        <TopicList topics={topics} selectTopic={this.setTopicName} />
+        <TopicList
+          topics={this.state.topics}
+          selectTopic={this.setTopicName}
+          loading={this.state.loading}
+        />
       </section>);
   }
 
   getAlertList(topicName) {
     return (
       <section className="aui-connect-page" role="main">
-        <AlertList alerts={[]} back={this.unsetTopicName} />
+        <AlertList
+          alerts={[]}
+          back={this.unsetTopicName}
+          loading={this.state.loading}
+        />
       </section>);
   }
 
+  getEmptyState() {
+    return (
+      <section className="aui-connect-page aui-connect-page-focused" role="main">
+      	<section className="aui-connect-content">
+      		<div className="aui-connect-content-inner">
+      				<img src="/img/logo.png" style={{height: "100px"}} />
+      				<h1>Could not retrieve any topics</h1>
+      				<p>Please try again later, or raise an issue in Bitbucket</p>
+      				<div className="aui-buttons">
+      					<a className="aui-button aui-button-primary" href="#">Repository</a>
+      					<button className="aui-button aui-button-default" onClick={() => { HipChat.sidebar.closeView() }}>Close Sidebar</button>
+      			</div>
+      		</div>
+      	</section>
+      </section>
+    );
+  }
+
+  componentWillMount() {
+    console.log('in componentWillMount');
+    // this.getData();
+    HipChat.register({
+      'glance-update': function(data) {
+        if (data.module_key === this.props.parentGlanceModuleKey) {
+          console.log('received glance-update', data);
+          // this.getData();
+        }
+      }.bind(this)
+    })
+  }
+
+  componentDidMount() {
+    console.log('in componentDidMount');
+  }
+
+  componentWillUnmount() {
+    if (this.dataRequest) {
+      this.dataRequest.abort();
+    }
+  }
+
   render() {
-    const topicName = this.state.topicName;
     console.log('state: ', this.state);
-    if (topicName) {
-      return this.getAlertList(topicName);
+    if (this.state.loading === false && this.state.topics.length === 0) {
+      return this.getEmptyState();
+    } else if (this.state.topicName) {
+      return this.getAlertList(this.state.topicName);
     } else {
       return this.getTopicList();
     }
@@ -174,12 +270,25 @@ class Sidebar extends React.Component {
 
 const topics = [
   { title: 'Topic 1', alerts: [{}, {}], status: 'OK' },
-  { title: 'Topic 2', alerts: [{}], actions: [{text: 'Test Action', href: '#'}], status: 'INSUFFICIENT_DATA' },
-  { title: 'Topic 3', alerts: [{}, {}, {}], actions: [{text: 'Test Action', href: '#'}], status: 'ALERT' }
+  { title: 'Topic 2', alerts: [{}], status: 'INSUFFICIENT_DATA' },
+  { title: 'Topic 3', alerts: [{}, {}, {}], status: 'ALERT' }
 ];
+
+const getQueryParam = key => {
+  const url = window.location.href;
+  key = key.replace(/[\[\]]/g, '\\$&');
+  const regex = new RegExp('[?&]' + key + '(=([^&#]*)|&|#|$)');
+  let results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+};
 
 // Insert into DOM
 ReactDOM.render(
-  <Sidebar />,
+  <Sidebar
+    sidebarModuleKey={getQueryParam('sidebar-module-key')}
+    parentGlanceModuleKey={getQueryParam('parent-glance-module-key')}
+  />,
   document.getElementById('content')
 );

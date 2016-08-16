@@ -67,7 +67,7 @@
           "value": "Sidebar Alpha!"
         },
         "location": "hipchat.sidebar.right",
-        "url": "${staticAssetsHost}/sidebar.html"
+        "url": "${staticAssetsHost}/sidebar.html?sidebar-module-key=sidebar.alpha&parent-glance-module-key=glance.alpha"
       },
       {
         "key": "sidebar.beta",
@@ -75,7 +75,7 @@
           "value": "Sidebar Beta!"
         },
         "location": "hipchat.sidebar.right",
-        "url": "${staticAssetsHost}/sidebar.html"
+        "url": "${staticAssetsHost}/sidebar.html?sidebar-module-key=sidebar.beta&parent-glance-module-key=glance.beta"
       }
     ],
     "dialog": [
