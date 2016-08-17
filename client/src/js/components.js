@@ -81,19 +81,6 @@ class ListItem extends React.Component {
 }
 
 class TopicList extends React.Component {
-  getLozengeClassNameForStatus(status) {
-    let className = 'aui-lozenge ';
-    if (status === 'OK') {
-      className += 'aui-lozenge-success';
-    } else if (status === 'INSUFFICIENT_DATA') {
-      className += 'aui-lozenge-current';
-    } else if (status === 'ALERT') {
-      className += 'aui-lozenge-error';
-    }
-
-    return className;
-  }
-
   render() {
     const loadingListItem = this.props.loading ? <LoadingListItem /> : undefined;
     const topicList = this.props.topics.map((topic, index) => (
@@ -104,7 +91,7 @@ class TopicList extends React.Component {
         actions={topic.actions}
         onclick={() => { this.props.selectTopic(topic.title) }}
         secondaryText={[
-          <span className={this.getLozengeClassNameForStatus(topic.status)}>{topic.status}</span>,
+          <span className={getLozengeClassNameForStatus(topic.status)}>{topic.status}</span>,
           '#alarms: ' + topic.alarms.length
         ]}
       />));
@@ -121,14 +108,14 @@ class TopicList extends React.Component {
 
 class AlarmList extends React.Component {
   render() {
-    const alarmList = this.props.alarms.map((topic, index) => (
+    const alarmList = this.props.alarms.map((alarm, index) => (
       <ListItem
         key={index}
         index={index}
-        title={topic.title}
-        actions={topic.actions}
+        title={alarm.AlarmName}
         secondaryText={[
-          '#alarms: ' + topic.alarms.length
+          <span className={getLozengeClassNameForStatus(alarm.NewStateValue)}>{alarm.NewStateValue}</span>,
+          alarm.AlarmDescription
         ]}
       />));
     return (
@@ -206,10 +193,11 @@ class Sidebar extends React.Component {
   }
 
   getAlarmList(topicName) {
+    const topic = this.state.topics.find(topic => topic.title === topicName);
     return (
       <section className="aui-connect-page" role="main">
         <AlarmList
-          alarms={[]}
+          alarms={topic && topic.alarms ? topic.alarms : []}
           back={this.unsetTopicName}
           loading={this.state.loading}
         />
@@ -271,6 +259,19 @@ const getQueryParam = key => {
   if (!results) return null;
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+};
+
+const getLozengeClassNameForStatus = status => {
+  let className = 'aui-lozenge ';
+  if (status === 'OK') {
+    className += 'aui-lozenge-success';
+  } else if (status === 'INSUFFICIENT_DATA') {
+    className += 'aui-lozenge-current';
+  } else if (status === 'ALERT') {
+    className += 'aui-lozenge-error';
+  }
+
+  return className;
 };
 
 // Insert into DOM
