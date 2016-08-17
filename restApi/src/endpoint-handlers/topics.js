@@ -30,16 +30,16 @@ const handler = (lib, hipchat, event, oauthData) => {
 const getAlarmsByTopic = (lib, alerts) => {
   let topics = {};
   alerts.forEach(entry => {
-    if (typeof topics[entry.topicGroupKey] === 'undefined') {
-      topics[entry.topicGroupKey] = [];
+    if (typeof topics[entry.topicName] === 'undefined') {
+      topics[entry.topicName] = [];
     }
 
-    topics[entry.topicGroupKey].push(entry.alarm);
+    topics[entry.topicName].push(entry.alarm);
   });
 
   return Object.keys(topics).map(key => {
     return {
-      title: lib.config.topicGroups[key].name,
+      title: key,
       alarms: topics[key],
       status: getSummaryStateForAlarms(lib, topics[key])
     };

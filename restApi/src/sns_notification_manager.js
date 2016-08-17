@@ -19,7 +19,7 @@ const notificationHandler = (lib, notification) => {
   lib.logger.debug('Topic Groups to update: ', { topicGroups: topicGroups });
   const currentState = getAlarmState(alarm);
   return co(function*() {
-    yield storeAlarmState(lib, topicGroups, alarm);
+    yield storeAlarmState(lib, topicGroups, topicName, alarm);
     const queryResult = yield lib.dbManager.scan(process.env.INSTALLATION_TABLE);
     const installations = queryResult.Items;
     for (const installation of installations) {
@@ -53,12 +53,13 @@ const getAlarmState = alarm => alarm.NewStateValue;
 * Even if duplicates, this accomodates scenarios where one alarm publishes multiple
 * topics.
 */
-const storeAlarmState = (lib, topicGroups, alarm) => {
+const storeAlarmState = (lib, topicGroups, topicName, alarm) => {
   return co(function*() {
     for (const topicGroupKey of topicGroups) {
       yield lib.dbManager.put(process.env.ALARM_TABLE, {
         alarmName: alarm.AlarmName,
         topicGroupKey: topicGroupKey,
+        topicName: topicName,
         alarm: alarm
       });
     }
