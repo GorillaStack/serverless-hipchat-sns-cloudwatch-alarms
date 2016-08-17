@@ -1,29 +1,48 @@
 'use strict';
 
+import { getSummaryStateForAlarms } from '../topic_group_manager';
+
 const handler = (lib, hipchat, event, oauthData) => {
   return new Promise((resolve, reject) => {
     try {
-      lib.logger.log('debug', 'In /topics handler');
+      lib.logger.debug('In /topics handler');
+      lib.logger.debug('topicGroupKey: ' + JSON.stringify(event));
+      lib.dbManager.query(process.env.ALARM_TABLE, 'topicGroupKey', event.body.topicGroupKey)
+        .then(result => {
+          lib.logger.debug('result.Items', { data: JSON.stringify(result.Items) });
+          const alertsByTopic = getAlarmsByTopic(lib, result.Items);
 
-      process.nextTick(() =>
-        resolve({
-          status: 'success',
-          topics: [
-            { title: 'Topic 1', alerts: [{}, {}], status: 'OK' },
-            { title: 'Topic 2', alerts: [{}], status: 'INSUFFICIENT_DATA' },
-            { title: 'Topic 3', alerts: [{}, {}, {}], status: 'ALERT' }
-          ]
-        }));
-      // hipchat.updateGlanceData(oauthData.oauthId, oauthData.roomId, 'sample.glance', glanceData).then(
-      //   () => resolve(),
-      //   (err) => {
-      //     lib.logger.log('error', 'Could not run /update-glance handler', err);
-      //     reject(err);
-      //   }
-      // );
+          resolve({
+            status: 'success',
+            topics: alertsByTopic
+          });
+        }, err => {
+          lib.logger.error('Could not retrieve alarms for topicGroupKey: ' + event.body.topicGroupKey,
+            { msg: err.toString(), stack: err.stack });
+          reject(err);
+        });
     } catch (err) {
       reject(err);
     }
+  });
+};
+
+const getAlarmsByTopic = (lib, alerts) => {
+  let topics = {};
+  alerts.forEach(entry => {
+    if (typeof topics[entry.topicGroupKey] === 'undefined') {
+      topics[entry.topicGroupKey] = [];
+    }
+
+    topics[entry.topicGroupKey].push(entry.alarm);
+  });
+
+  return Object.keys(topics).map(key => {
+    return {
+      title: lib.config.topicGroups[key].name,
+      alarms: topics[key],
+      status: getSummaryStateForAlarms(lib, topics[key])
+    };
   });
 };
 

@@ -73,12 +73,6 @@
         });
       });
 
-      //Handle the message action "sample-message-action" declared in the descriptor
-      HipChat.register({
-        'sample-message-action': function (message) {
-          $('#msg').text(JSON.stringify(message));
-        }
-      });
     });
   </script>
 </body>

@@ -85,7 +85,7 @@ const getDbManager = (config, logger) => {
     scan: function (tableName) {
       return new Promise((resolve, reject) => {
         const params = {
-          TableName: tableName,
+          TableName: tableName
         };
         this.dynamodb.scan(params, (error, data) => {
           if (error) {

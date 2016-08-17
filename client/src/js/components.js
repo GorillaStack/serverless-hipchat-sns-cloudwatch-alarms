@@ -105,7 +105,7 @@ class TopicList extends React.Component {
         onclick={() => { this.props.selectTopic(topic.title) }}
         secondaryText={[
           <span className={this.getLozengeClassNameForStatus(topic.status)}>{topic.status}</span>,
-          '#alerts: ' + topic.alerts.length
+          '#alarms: ' + topic.alarms.length
         ]}
       />));
     return (
@@ -119,23 +119,23 @@ class TopicList extends React.Component {
   }
 }
 
-class AlertList extends React.Component {
+class AlarmList extends React.Component {
   render() {
-    const alertList = this.props.alerts.map((topic, index) => (
+    const alarmList = this.props.alarms.map((topic, index) => (
       <ListItem
         key={index}
         index={index}
         title={topic.title}
         actions={topic.actions}
         secondaryText={[
-          '#alerts: ' + topic.alerts.length
+          '#alarms: ' + topic.alarms.length
         ]}
       />));
     return (
       <section className="aui-connect-content with-list">
         <a className="aui-connect-back" onClick={this.props.back}>Back</a>
         <ol className="aui-connect-list">
-          {alertList}
+          {alarmList}
         </ol>
       </section>
     );
@@ -149,12 +149,12 @@ class Sidebar extends React.Component {
       topics: [],
       loading: false,
       topicName: null,
-      alertName: null
+      alarmName: null
     };
 
     this.setTopicName = this.setTopicName.bind(this);
     this.unsetTopicName = this.unsetTopicName.bind(this);
-    this.unsetAlertName = this.unsetAlertName.bind(this);
+    this.unsetAlarmName = this.unsetAlarmName.bind(this);
   }
 
   setTopicName(topicName) {
@@ -165,22 +165,23 @@ class Sidebar extends React.Component {
     this.setState({ topicName: null });
   }
 
-  unsetAlertName() {
-    this.setState({ alertName: null });
+  unsetAlarmName() {
+    this.setState({ alarmName: null });
   }
 
   getData() {
     this.setState({ loading: true });
     HipChat.auth.withToken((err, token) => {
       this.dataRequest = $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: '${host}/topics',
         headers: { authorization: 'JWT ' + token },
+        data: JSON.stringify({ topicGroupKey: this.props.sidebarModuleKey.split(/\./)[1] }),
         crossDomain: true,
         contentType: 'application/json',
         dataType: 'json',
         success: function(data) {
-          this.setState({ loading: false, topics: data });
+          this.setState({ loading: false, topics: data.topics });
         }.bind(this),
         error: function (response, jqXHR, status) {
           this.setState({ loading: false });
@@ -204,11 +205,11 @@ class Sidebar extends React.Component {
       </section>);
   }
 
-  getAlertList(topicName) {
+  getAlarmList(topicName) {
     return (
       <section className="aui-connect-page" role="main">
-        <AlertList
-          alerts={[]}
+        <AlarmList
+          alarms={[]}
           back={this.unsetTopicName}
           loading={this.state.loading}
         />
@@ -224,7 +225,7 @@ class Sidebar extends React.Component {
       				<h1>Could not retrieve any topics</h1>
       				<p>Please try again later, or raise an issue in Bitbucket</p>
       				<div className="aui-buttons">
-      					<a className="aui-button aui-button-primary" href="#">Repository</a>
+      					<a className="aui-button aui-button-primary" href="https://bitbucket.org/gorillastack/serverless-hipchat-sns-cloudwatch-alarms">Repository</a>
       					<button className="aui-button aui-button-default" onClick={() => { HipChat.sidebar.closeView() }}>Close Sidebar</button>
       			</div>
       		</div>
@@ -234,20 +235,14 @@ class Sidebar extends React.Component {
   }
 
   componentWillMount() {
-    console.log('in componentWillMount');
-    // this.getData();
+    this.getData();
     HipChat.register({
       'glance-update': function(data) {
         if (data.module_key === this.props.parentGlanceModuleKey) {
-          console.log('received glance-update', data);
-          // this.getData();
+          this.getData();
         }
       }.bind(this)
     })
-  }
-
-  componentDidMount() {
-    console.log('in componentDidMount');
   }
 
   componentWillUnmount() {
@@ -257,11 +252,11 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    console.log('state: ', this.state);
-    if (this.state.loading === false && this.state.topics.length === 0) {
+    const state = this.state;
+    if (state.loading === false && state.topics.length === 0) {
       return this.getEmptyState();
-    } else if (this.state.topicName) {
-      return this.getAlertList(this.state.topicName);
+    } else if (state.topicName) {
+      return this.getAlarmList(state.topicName);
     } else {
       return this.getTopicList();
     }
@@ -269,9 +264,9 @@ class Sidebar extends React.Component {
 }
 
 const topics = [
-  { title: 'Topic 1', alerts: [{}, {}], status: 'OK' },
-  { title: 'Topic 2', alerts: [{}], status: 'INSUFFICIENT_DATA' },
-  { title: 'Topic 3', alerts: [{}, {}, {}], status: 'ALERT' }
+  { title: 'Topic 1', alarms: [{}, {}], status: 'OK' },
+  { title: 'Topic 2', alarms: [{}], status: 'INSUFFICIENT_DATA' },
+  { title: 'Topic 3', alarms: [{}, {}, {}], status: 'ALERT' }
 ];
 
 const getQueryParam = key => {

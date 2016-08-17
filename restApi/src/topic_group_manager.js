@@ -80,17 +80,7 @@ const getTopicGroupState = (lib, topicGroupKey) => {
       .then(
         res => {
           lib.logger.debug('Received results for getTopicGroupState', { results: res });
-          const someError = res.Items.every(item => item.alarm.NewStateValue === ALARM_STATE);
-          const someInsufficientData = res.Items.every(item => item.alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
-          if (res.Count === 0) {
-            resolve(EMPTY_STATE);
-          } else if (someError) {
-            resolve(ALARM_STATE);
-          } else if (someInsufficientData) {
-            resolve(INSUFFICIENT_DATA_STATE);
-          } else {
-            resolve(OK_STATE);
-          }
+          resolve(getSummaryStateForAlarms(lib, res.Items));
         },
 
         err => {
@@ -101,4 +91,18 @@ const getTopicGroupState = (lib, topicGroupKey) => {
   });
 };
 
-export { setTopicData, getTopicData, getGlanceFormattedTopicGroupState, getTopicGroupState };
+const getSummaryStateForAlarms = (lib, alarms) => {
+  const someError = alarms.every(alarm => alarm.NewStateValue === ALARM_STATE);
+  const someInsufficientData = alarms.every(alarm => alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
+  if (alarms.length === 0) {
+    return EMPTY_STATE;
+  } else if (someError) {
+    return ALARM_STATE;
+  } else if (someInsufficientData) {
+    return INSUFFICIENT_DATA_STATE;
+  } else {
+    return OK_STATE;
+  }
+};
+
+export { setTopicData, getTopicData, getGlanceFormattedTopicGroupState, getTopicGroupState, getSummaryStateForAlarms };
