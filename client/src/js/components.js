@@ -263,12 +263,6 @@ class Sidebar extends React.Component {
   }
 }
 
-const topics = [
-  { title: 'Topic 1', alarms: [{}, {}], status: 'OK' },
-  { title: 'Topic 2', alarms: [{}], status: 'INSUFFICIENT_DATA' },
-  { title: 'Topic 3', alarms: [{}, {}, {}], status: 'ALERT' }
-];
-
 const getQueryParam = key => {
   const url = window.location.href;
   key = key.replace(/[\[\]]/g, '\\$&');
