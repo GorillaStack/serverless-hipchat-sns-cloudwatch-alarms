@@ -80,7 +80,7 @@ const getTopicGroupState = (lib, topicGroupKey) => {
       .then(
         res => {
           lib.logger.debug('Received results for getTopicGroupState', { results: res });
-          resolve(getSummaryStateForAlarms(lib, res.Items));
+          resolve(getSummaryStateForAlarms(lib, res.Items.map(alarmEntry => alarmEntry.alarm)));
         },
 
         err => {
@@ -92,8 +92,8 @@ const getTopicGroupState = (lib, topicGroupKey) => {
 };
 
 const getSummaryStateForAlarms = (lib, alarms) => {
-  const someError = alarms.every(alarm => alarm.NewStateValue === ALARM_STATE);
-  const someInsufficientData = alarms.every(alarm => alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
+  const someError = alarms.some(alarm => alarm.NewStateValue === ALARM_STATE);
+  const someInsufficientData = alarms.some(alarm => alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
   if (alarms.length === 0) {
     return EMPTY_STATE;
   } else if (someError) {

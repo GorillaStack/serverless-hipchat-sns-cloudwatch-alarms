@@ -17,7 +17,6 @@ const notificationHandler = (lib, notification) => {
   lib.logger.info('Topic ' + topicName + ' received CloudWatch Alarm: ', { alarm: alarm });
   const topicGroups = getTopicGroupsToUpdate(topicName, lib.config.topicGroups);
   lib.logger.debug('Topic Groups to update: ', { topicGroups: topicGroups });
-  const currentState = getAlarmState(alarm);
   return co(function*() {
     yield storeAlarmState(lib, topicGroups, topicName, alarm);
     const queryResult = yield lib.dbManager.scan(process.env.INSTALLATION_TABLE);
