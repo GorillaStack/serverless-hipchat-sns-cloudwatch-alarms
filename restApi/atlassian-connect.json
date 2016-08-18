@@ -12,7 +12,7 @@
   },
   "capabilities": {
     "hipchatApiConsumer": {
-      "fromName": "Sample Add-on",
+      "fromName": "GorillaStack OSS Live CloudWatch Alarm",
       "scopes": [
         "send_notification",
         "view_room"
@@ -25,15 +25,6 @@
     "configurable": {
       "url": "${staticAssetsHost}/configure.html"
     },
-    "webhook": [
-      {
-        "url": "${host}/echo",
-        "pattern": "^/echo",
-        "event": "room_message",
-        "name": "Echo",
-        "authentication": "jwt"
-      }
-    ],
     "glance": [
       {
         "name": {
@@ -76,39 +67,6 @@
         },
         "location": "hipchat.sidebar.right",
         "url": "${staticAssetsHost}/sidebar.html?sidebar-module-key=sidebar.beta&parent-glance-module-key=glance.beta"
-      }
-    ],
-    "dialog": [
-      {
-        "key": "sample.dialog",
-        "title": {
-          "value": "Hello Dialog!"
-        },
-        "url": "${staticAssetsHost}/dialog.html",
-        "options": {
-          "style": "normal",
-          "primaryAction": {
-            "name": {
-              "value": "Say Hello!"
-            },
-            "key": "sample.dialog.action",
-            "enabled": true
-          },
-          "size": {
-            "width": "400px",
-            "height": "200px"
-          }
-        }
-      }
-    ],
-    "action": [
-      {
-        "key": "sample.action",
-        "name": {
-          "value": "Open Hello Dialog!"
-        },
-        "target": "sample.dialog",
-        "location": "hipchat.input.action"
       }
     ]
   }

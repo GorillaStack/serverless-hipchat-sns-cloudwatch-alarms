@@ -31,13 +31,11 @@ const CAPABILITIES_FILE_PATH = process.env.IS_OFFLINE ? './restApi/atlassian-con
 const getIndex = (params) => {
   let options = params || {};
 
-  // Create a logger for our logic
-  const logger = createLogger();
-  logger.log('debug', 'Started Logger');
 
   // Import application configuration
-  logger.log('debug', 'Loading application configuration for stage "%s"', process.env.SERVERLESS_STAGE);
   const config = getApplicationConfiguration(options.configFile || CONFIG_FILE_PATH);
+  const logger = createLogger(config.logLevel || 'debug');
+  logger.log('debug', 'Started Logger');
   logger.log('info', 'Application configuration loaded');
   logger.log('debug', 'Application configuration:', config);
 

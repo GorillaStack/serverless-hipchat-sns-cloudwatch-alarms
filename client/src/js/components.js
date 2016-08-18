@@ -14,8 +14,25 @@ class AlarmSummary extends React.Component {
   }
 
   postAlertAsCardToRoom() {
-    // TODO Implement call to postCard
-    console.log('escalating');
+    const alarm = this.props.alarm;
+    HipChat.user.getCurrentUser((err, userInfo) => {
+      HipChat.auth.withToken((err, token) => {
+        $.ajax({
+          type: 'POST',
+          url: '${host}/post-card',
+          headers: { authorization: 'JWT ' + token },
+          data: JSON.stringify({ alarm: alarm, user: '@' + userInfo.mention_name }),
+          crossDomain: true,
+          contentType: 'application/json',
+          dataType: 'json',
+          error: function (response, jqXHR, status) {
+            if (response.status !== 200) {
+              alert('fail' + status.code);
+            }
+          }
+        });
+      });
+    });
   }
 
   render() {
@@ -33,7 +50,7 @@ class AlarmSummary extends React.Component {
           </div>
           <p style={{borderColor: getColorForAlarmState(alarm.NewStateValue)}}>{alarm.NewStateReason}</p>
           <div className="centred">
-            <button className="aui-button aui-button-primary" onClick={this.postAlertAsCardToRoom}>
+            <button className="aui-button aui-button-primary" onClick={() => { this.postAlertAsCardToRoom() }}>
               <span className="aui-icon aui-icon-small aui-iconfont-priority-highest">Escalate Icon</span>
               Escalate to Room
             </button>
