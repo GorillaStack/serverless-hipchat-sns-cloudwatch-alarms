@@ -81,20 +81,36 @@ class ListItem extends React.Component {
 }
 
 class TopicList extends React.Component {
+  getStatusCounts(alarms) {
+    let statusCounts = {};
+    alarms.forEach(alarm => {
+      if (typeof statusCounts[alarm.NewStateValue] === 'undefined') {
+        statusCounts[alarm.NewStateValue] = 0;
+      }
+      statusCounts[alarm.NewStateValue]++;
+    });
+
+    return statusCounts;
+  }
+
+  renderedStatusCounts(statusCounts) {
+    return Object.keys(statusCounts).map(status =>
+      <span className={getLozengeClassNameForStatus(status)}>{statusCounts[status] + ' x ' + status}</span>);
+  }
+
   render() {
     const loadingListItem = this.props.loading ? <LoadingListItem /> : undefined;
-    const topicList = this.props.topics.map((topic, index) => (
-      <ListItem
+    const topicList = this.props.topics.map((topic, index) => {
+      console.log(topic);
+      return (<ListItem
         key={index}
         index={index}
         title={topic.title}
         actions={topic.actions}
         onclick={() => { this.props.selectTopic(topic.title) }}
-        secondaryText={[
-          <span className={getLozengeClassNameForStatus(topic.status)}>{topic.status}</span>,
-          '#alarms: ' + topic.alarms.length
-        ]}
-      />));
+        secondaryText={ this.renderedStatusCounts(this.getStatusCounts(topic.alarms)) }
+      />)
+    });
     return (
       <section className="aui-connect-content with-list">
         <ol className="aui-connect-list">
