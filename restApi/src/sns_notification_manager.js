@@ -43,8 +43,6 @@ const getTopicGroupsToUpdate = (topicName, topicGroups) => {
   });
 };
 
-const getAlarmState = alarm => alarm.NewStateValue;
-
 /**
 * storeAlarmState
 *
