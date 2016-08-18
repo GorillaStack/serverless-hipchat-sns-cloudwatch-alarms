@@ -1,3 +1,27 @@
 .clickable-list-item:hover {
   background-color: #efefef;
+  cursor: pointer;
+}
+
+.alarm-summary {
+  padding: 20px;
+}
+
+.centred {
+  padding-top: 10px;
+  text-align: center;
+}
+
+.alarm-summary .aui-lozenge {
+  text-size: 0.95em;
+}
+
+.alarm-summary p {
+  padding-left: 10px;
+  border-left: 3px solid grey;
+}
+
+.alarm-summary .footer {
+  margin-top: 10px;
+  border-top: 1px dashed grey;
 }

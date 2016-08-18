@@ -1,3 +1,52 @@
+class AlarmSummary extends React.Component {
+  getStateChangeDateTime() {
+    const options = {
+      weekday: 'short',
+      year: '2-digit',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+
+    const date = new Date(Date.parse(this.props.alarm.StateChangeTime));
+    return date.toLocaleDateString('en-AU', options);
+  }
+
+  postAlertAsCardToRoom() {
+    // TODO Implement call to postCard
+    console.log('escalating');
+  }
+
+  render() {
+    const alarm = this.props.alarm;
+    return (
+      <div>
+        <a className="aui-connect-back" onClick={this.props.back}>Back</a>
+        <div className="alarm-summary">
+          <h1>{alarm.AlarmName}</h1>
+          <h3>{alarm.AlarmDescription}</h3>
+          <div className="centred">
+            <span className={getLozengeClassNameForStatus(alarm.OldStateValue)}>{alarm.OldStateValue}</span>
+            <span className="aui-icon aui-icon-small aui-iconfont-devtools-arrow-right">changed to</span>
+            <span className={getLozengeClassNameForStatus(alarm.NewStateValue)}>{alarm.NewStateValue}</span>
+          </div>
+          <p style={{borderColor: getColorForAlarmState(alarm.NewStateValue)}}>{alarm.NewStateReason}</p>
+          <div className="centred">
+            <button className="aui-button aui-button-primary" onClick={this.postAlertAsCardToRoom}>
+              <span className="aui-icon aui-icon-small aui-iconfont-priority-highest">Escalate Icon</span>
+              Escalate to Room
+            </button>
+          </div>
+          <div className="footer">
+            <h4>Changed at {this.getStateChangeDateTime()}</h4>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
 class LoadingListItem extends React.Component {
   componentDidMount() {
     $(".spinner").spin();
@@ -101,7 +150,6 @@ class TopicList extends React.Component {
   render() {
     const loadingListItem = this.props.loading ? <LoadingListItem /> : undefined;
     const topicList = this.props.topics.map((topic, index) => {
-      console.log(topic);
       return (<ListItem
         key={index}
         index={index}
@@ -129,6 +177,7 @@ class AlarmList extends React.Component {
         key={index}
         index={index}
         title={alarm.AlarmName}
+        onclick={() => { this.props.setAlarmName(alarm.AlarmName) }}
         secondaryText={[
           <span className={getLozengeClassNameForStatus(alarm.NewStateValue)}>{alarm.NewStateValue}</span>,
           alarm.AlarmDescription
@@ -152,16 +201,21 @@ class Sidebar extends React.Component {
       topics: [],
       loading: false,
       topicName: null,
-      alarmName: null
+      alarm: null
     };
 
     this.setTopicName = this.setTopicName.bind(this);
     this.unsetTopicName = this.unsetTopicName.bind(this);
+    this.setAlarmName = this.setAlarmName.bind(this);
     this.unsetAlarmName = this.unsetAlarmName.bind(this);
   }
 
   setTopicName(topicName) {
     this.setState({ topicName: topicName });
+  }
+
+  setAlarmName(alarmName) {
+    this.setState({ alarmName: alarmName });
   }
 
   unsetTopicName() {
@@ -215,6 +269,21 @@ class Sidebar extends React.Component {
         <AlarmList
           alarms={topic && topic.alarms ? topic.alarms : []}
           back={this.unsetTopicName}
+          setAlarmName={this.setAlarmName}
+          loading={this.state.loading}
+        />
+      </section>);
+  }
+
+  getAlarmSummary(alarmName) {
+    let allAlarms = [];
+    this.state.topics.forEach(topic => { allAlarms = allAlarms.concat(topic.alarms); });
+    const alarm = allAlarms.find(alarm => alarm.AlarmName === alarmName);
+    return (
+      <section className="aui-connect-page" role="main">
+        <AlarmSummary
+          alarm={alarm}
+          back={this.unsetAlarmName}
           loading={this.state.loading}
         />
       </section>);
@@ -259,6 +328,8 @@ class Sidebar extends React.Component {
     const state = this.state;
     if (state.loading === false && state.topics.length === 0) {
       return this.getEmptyState();
+    } else if (state.alarmName) {
+      return this.getAlarmSummary(state.alarmName);
     } else if (state.topicName) {
       return this.getAlarmList(state.topicName);
     } else {
@@ -288,6 +359,16 @@ const getLozengeClassNameForStatus = status => {
   }
 
   return className;
+};
+
+const getColorForAlarmState = status => {
+  if (status === 'OK') {
+    return '#14892c';
+  } else if (status === 'INSUFFICIENT_DATA') {
+    return '#f6c342';
+  } else if (status === 'ALERT') {
+    return '#d04437';
+  }
 };
 
 // Insert into DOM
