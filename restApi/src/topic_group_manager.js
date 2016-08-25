@@ -32,7 +32,7 @@ const LOZENGES = {
   ALARM: {
     type: 'lozenge',
     value: {
-      label: 'Error',
+      label: 'Alarm',
       type: 'error'
     }
   },

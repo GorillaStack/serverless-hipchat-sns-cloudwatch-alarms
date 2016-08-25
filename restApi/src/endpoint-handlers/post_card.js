@@ -69,7 +69,7 @@ const getLozengeStyleForStatus = status => {
     return 'lozenge-success';
   } else if (status === 'INSUFFICIENT_DATA') {
     return 'lozenge-current';
-  } else if (status === 'ALERT') {
+  } else if (status === 'ALARM') {
     return 'lozenge-error';
   }
 };

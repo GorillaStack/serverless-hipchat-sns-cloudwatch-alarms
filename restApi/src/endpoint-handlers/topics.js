@@ -10,11 +10,11 @@ const handler = (lib, hipchat, event, oauthData) => {
       lib.dbManager.query(process.env.ALARM_TABLE, 'topicGroupKey', event.body.topicGroupKey)
         .then(result => {
           lib.logger.debug('result.Items', { data: JSON.stringify(result.Items) });
-          const alertsByTopic = getAlarmsByTopic(lib, result.Items);
+          const alarmsByTopic = getAlarmsByTopic(lib, result.Items);
 
           resolve({
             status: 'success',
-            topics: alertsByTopic
+            topics: alarmsByTopic
           });
         }, err => {
           lib.logger.error('Could not retrieve alarms for topicGroupKey: ' + event.body.topicGroupKey,
@@ -27,9 +27,9 @@ const handler = (lib, hipchat, event, oauthData) => {
   });
 };
 
-const getAlarmsByTopic = (lib, alerts) => {
+const getAlarmsByTopic = (lib, alarms) => {
   let topics = {};
-  alerts.forEach(entry => {
+  alarms.forEach(entry => {
     if (typeof topics[entry.topicName] === 'undefined') {
       topics[entry.topicName] = [];
     }

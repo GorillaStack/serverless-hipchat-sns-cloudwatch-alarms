@@ -13,7 +13,7 @@ class AlarmSummary extends React.Component {
     return date.toLocaleDateString('en-AU', options);
   }
 
-  postAlertAsCardToRoom() {
+  postAlarmAsCardToRoom() {
     const alarm = this.props.alarm;
     HipChat.user.getCurrentUser((err, userInfo) => {
       HipChat.auth.withToken((err, token) => {
@@ -50,7 +50,7 @@ class AlarmSummary extends React.Component {
           </div>
           <p style={{borderColor: getColorForAlarmState(alarm.NewStateValue)}}>{alarm.NewStateReason}</p>
           <div className="centred">
-            <button className="aui-button aui-button-primary" onClick={() => { this.postAlertAsCardToRoom() }}>
+            <button className="aui-button aui-button-primary" onClick={() => { this.postAlarmAsCardToRoom() }}>
               <span className="aui-icon aui-icon-small aui-iconfont-priority-highest">Escalate Icon</span>
               Escalate to Room
             </button>
@@ -371,7 +371,7 @@ const getLozengeClassNameForStatus = status => {
     className += 'aui-lozenge-success';
   } else if (status === 'INSUFFICIENT_DATA') {
     className += 'aui-lozenge-current';
-  } else if (status === 'ALERT') {
+  } else if (status === 'ALARM') {
     className += 'aui-lozenge-error';
   }
 
@@ -383,7 +383,7 @@ const getColorForAlarmState = status => {
     return '#14892c';
   } else if (status === 'INSUFFICIENT_DATA') {
     return '#f6c342';
-  } else if (status === 'ALERT') {
+  } else if (status === 'ALARM') {
     return '#d04437';
   }
 };
