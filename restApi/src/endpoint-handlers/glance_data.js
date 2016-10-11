@@ -1,6 +1,6 @@
 import { getTopicGroupState, getGlanceFormattedTopicGroupState } from '../topic_group_manager';
 
-const handler = lib => new Promise((resolve, reject) => {
+const handler = (lib, hipchat, event) => new Promise((resolve, reject) => {
   try {
     lib.logger.debug('In /glance-data handler');
     lib.logger.debug(event);
