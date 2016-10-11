@@ -7,7 +7,7 @@
 
 import co from 'co';
 import { getGlanceFormattedTopicGroupState, getTopicGroupState } from './topic_group_manager';
-import { HipChatAPI } from './hipchat_api';
+import HipChatAPI from './hipchat_api';
 
 const GLANCE_PREFIX = 'glance.';
 
