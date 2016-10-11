@@ -46,4 +46,4 @@ const getAlarmsByTopic = (lib, alarms) => {
   });
 };
 
-export { handler };
+export default handler;
