@@ -17,40 +17,39 @@ const LOZENGES = {
     type: 'lozenge',
     value: {
       label: 'All OK',
-      type: 'success'
-    }
+      type: 'success',
+    },
   },
 
   INSUFFICIENT_DATA: {
     type: 'lozenge',
     value: {
       label: 'Insufficient Data',
-      type: 'current'
-    }
+      type: 'current',
+    },
   },
 
   ALARM: {
     type: 'lozenge',
     value: {
       label: 'Alarm',
-      type: 'error'
-    }
+      type: 'error',
+    },
   },
 
   EMPTY: {
     type: 'lozenge',
     value: {
       label: 'No Data',
-      type: 'default'
-    }
-  }
+      type: 'default',
+    },
+  },
 };
 
 
-const setTopicData = (lib, topicGroup, data) => {
-};
+const setTopicData = () => {};
 
-const getTopicData = (lib, topicGroup) => {};
+const getTopicData = () => {};
 
 /**
 * getGlanceFormattedTopicGroupState
@@ -60,49 +59,56 @@ const getTopicData = (lib, topicGroup) => {};
 * @param topicGroup - {String} - topic group name
 * @param state      - {String} - (optional) - current state to report
 */
-const getGlanceFormattedTopicGroupState = (lib, topicGroup, state) => {
-  state = state || 'OK';
+const getGlanceFormattedTopicGroupState = (lib, topicGroup, state = 'OK') => {
   const topicGroupConfig = lib.config.topicGroups[topicGroup] || {};
   const glanceData = {
     label: {
-      value: '<b>' + (topicGroupConfig.name || topicGroup) + '</b>',
-      type: 'html'
+      value: `<b>${(topicGroupConfig.name || topicGroup)}</b>`,
+      type: 'html',
     },
-    status: LOZENGES[state]
+    status: LOZENGES[state],
   };
 
   return glanceData;
 };
 
-const getTopicGroupState = (lib, topicGroupKey) => {
-  return new Promise((resolve, reject) => {
-    lib.dbManager.query(process.env.ALARM_TABLE, 'topicGroupKey', topicGroupKey)
-      .then(
-        res => {
-          lib.logger.debug('Received results for getTopicGroupState', { results: res });
-          resolve(getSummaryStateForAlarms(lib, res.Items.map(alarmEntry => alarmEntry.alarm)));
-        },
-
-        err => {
-          lib.logger.error('getTopicGroupState received error', { err: err.toString(), stack: err.stack });
-          reject(err);
-        }
-      );
-  });
-};
-
 const getSummaryStateForAlarms = (lib, alarms) => {
   const someError = alarms.some(alarm => alarm.NewStateValue === ALARM_STATE);
-  const someInsufficientData = alarms.some(alarm => alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
+  const someInsufficientData = alarms
+    .some(alarm => alarm.NewStateValue === INSUFFICIENT_DATA_STATE);
   if (alarms.length === 0) {
     return EMPTY_STATE;
   } else if (someError) {
     return ALARM_STATE;
   } else if (someInsufficientData) {
     return INSUFFICIENT_DATA_STATE;
-  } else {
-    return OK_STATE;
   }
+
+  return OK_STATE;
 };
 
-export { setTopicData, getTopicData, getGlanceFormattedTopicGroupState, getTopicGroupState, getSummaryStateForAlarms };
+const getTopicGroupState = (lib, topicGroupKey) => new Promise((resolve, reject) => {
+  lib.dbManager.query(process.env.ALARM_TABLE, 'topicGroupKey', topicGroupKey)
+    .then(
+      res => {
+        lib.logger.debug('Received results for getTopicGroupState', { results: res });
+        resolve(getSummaryStateForAlarms(lib, res.Items.map(alarmEntry => alarmEntry.alarm)));
+      },
+
+      err => {
+        lib.logger.error('getTopicGroupState received error', {
+          err: err.toString(),
+          stack: err.stack,
+        });
+        reject(err);
+      }
+    );
+});
+
+export {
+  setTopicData,
+  getTopicData,
+  getGlanceFormattedTopicGroupState,
+  getTopicGroupState,
+  getSummaryStateForAlarms,
+};

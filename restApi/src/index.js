@@ -15,7 +15,8 @@ import { getDbManager } from './dynamo_db_manager';
 
 // Constants - deal with root_dir difference when working locally/offline
 const CONFIG_FILE_PATH = process.env.IS_OFFLINE ? './restApi/config.json' : './config.json';
-const CAPABILITIES_FILE_PATH = process.env.IS_OFFLINE ? './restApi/atlassian-connect.json' : './atlassian-connect.json';
+const CAPABILITIES_FILE_PATH = process.env.IS_OFFLINE
+  ? './restApi/atlassian-connect.json' : './atlassian-connect.json';
 
 /* ----- MODULE CONSTRUCTOR ----- */
 
@@ -28,35 +29,34 @@ const CAPABILITIES_FILE_PATH = process.env.IS_OFFLINE ? './restApi/atlassian-con
 *   capabilitiesFile: './path'
 * }
 */
-const getIndex = (params) => {
-  let options = params || {};
+const getIndex = params => {
+  const options = params || {};
 
-
-  // Import application configuration
+  // Create a logger for our logic
   const config = getApplicationConfiguration(options.configFile || CONFIG_FILE_PATH);
   const logger = createLogger(config.logLevel || 'debug');
-  logger.log('debug', 'Started Logger');
-  logger.log('info', 'Application configuration loaded');
-  logger.log('debug', 'Application configuration:', config);
+  logger.debug('Started Logger');
+  logger.info('Application configuration loaded');
+  logger.debug('Application configuration:', config);
 
   // Let's be lazy about loading capabilities
   const getCapabilities = () => {
-    logger.log('debug', 'Loading capabilities descriptor', process.env.SERVERLESS_STAGE);
-    let capabilities = getCapabilityDescriptor(CAPABILITIES_FILE_PATH, config);
-    logger.log('info', 'Capabilities descriptor loaded');
-    logger.log('debug', 'Capabilities descriptor:', capabilities);
+    logger.debug('Loading capabilities descriptor', process.env.SERVERLESS_STAGE);
+    const capabilities = getCapabilityDescriptor(CAPABILITIES_FILE_PATH, config);
+    logger.info('Capabilities descriptor loaded');
+    logger.debug('Capabilities descriptor:', capabilities);
     return capabilities;
   };
 
   // Create DynamoDBManager
   const dbManager = getDbManager(config, logger);
-  logger.log('info', 'DynamoDB Manager loaded');
+  logger.info('DynamoDB Manager loaded');
 
   return {
-    logger: logger,
-    config: config,
-    getCapabilities: getCapabilities,
-    dbManager: dbManager
+    logger,
+    config,
+    getCapabilities,
+    dbManager,
   };
 };
 
