@@ -1,24 +1,20 @@
-'use strict';
+const handler = (lib, hipchat, event, oauthData) => new Promise((resolve, reject) => {
+  try {
+    lib.logger.debug('In /post-card handler');
 
-const handler = (lib, hipchat, event, oauthData) => {
-  return new Promise((resolve, reject) => {
-    try {
-      lib.logger.debug('In /post-card handler');
-
-      lib.logger.debug('requrest body for card', event.body);
-      const message = formatMessageForAlarm(event.body.alarm, event.body.user);
-      hipchat.sendMessage(oauthData.oauthId, oauthData.roomId, message).then(
-        (res) => resolve(res),
-        (err) => {
-          lib.logger.error('Could not run /post-card handler', err);
-          reject(err);
-        }
-      );
-    } catch (err) {
-      reject(err);
-    }
-  });
-};
+    lib.logger.debug('requrest body for card', event.body);
+    const message = formatMessageForAlarm(event.body.alarm, event.body.user);
+    hipchat.sendMessage(oauthData.oauthId, oauthData.roomId, message).then(
+      (res) => resolve(res),
+      (err) => {
+        lib.logger.error('Could not run /post-card handler', err);
+        reject(err);
+      }
+    );
+  } catch (err) {
+    reject(err);
+  }
+});
 
 const formatMessageForAlarm = (alarm, user) => {
   return {
@@ -74,4 +70,4 @@ const getLozengeStyleForStatus = status => {
   }
 };
 
-export { handler };
+export default handler;
