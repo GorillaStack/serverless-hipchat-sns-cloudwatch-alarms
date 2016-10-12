@@ -1,7 +1,7 @@
 # serverless-hipchat-sns-cloudwatch-alarms
 
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
-[![Codeship Status for gorillastack/serverless-hipchat-sns-cloudwatch-alarms](https://app.codeship.com/projects/cbd253a0-7267-0134-6012-5aa85ce0d8db/status?branch=master)](https://app.codeship.com/projects/178607))
+[![Codeship Status for gorillastack/serverless-hipchat-sns-cloudwatch-alarms](https://app.codeship.com/projects/cbd253a0-7267-0134-6012-5aa85ce0d8db/status?branch=master)](https://app.codeship.com/projects/178607)
 
 This is a repository originally written by [GorillaStack](https://www.gorillastack.com) to demonstrate how to build plugins for HipChat using Atlassian Connect and how to host them using AWS serverless technologies.
 
