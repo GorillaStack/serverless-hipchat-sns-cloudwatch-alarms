@@ -4,7 +4,7 @@
   "description": "Serverless Lambda function for project: serverless-hipchat-sns-cloudwatch-alarms",
   "customName": false,
   "customRole": false,
-  "handler": "handler.handler",
+  "handler": "functions/notificationHandler/handler.handler",
   "timeout": 6,
   "memorySize": 1024,
   "authorizer": {},
@@ -48,8 +48,8 @@
     "ALARM_TABLE": "${cloudWatchAlarmTableName}"
   },
   "sns": [
-    "arn:aws:sns:us-east-1:${awsAccountId}:SampleTopic1",
-    "arn:aws:sns:us-east-1:${awsAccountId}:SampleTopic2"
+    { "topic": "SampleTopic1" },
+    { "topic": "SampleTopic2" }
   ],
   "vpc": {
     "securityGroupIds": [],

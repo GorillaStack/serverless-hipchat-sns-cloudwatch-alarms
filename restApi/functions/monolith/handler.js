@@ -40,15 +40,35 @@ const callEndpointHandler = (endpoint, args) => {
   }
 };
 
+/**
+* Deal with cases where event params, query params and headers come through escaped
+* Caused by discrepancy between behaviour of API Gateway and the serverless-offline
+* plugin
+*/
+const guaranteeEventJSON = event => {
+  const eventJSON = {};
+  const keysToCheck = ['headers', 'params', 'query'];
+  Object.keys(event).forEach(key => {
+    if (keysToCheck.indexOf(key) > -1 && typeof event[key] === 'string') {
+      eventJSON[key] = JSON.parse(event[key]);
+    } else {
+      eventJSON[key] = event[key];
+    }
+  });
+
+  return eventJSON;
+};
+
 exports.handler = function (event, context, cb) {
   const endpoint = event.path;
   lib.logger.info('Handling endpoint: ', endpoint);
   lib.logger.debug('Event json:', JSON.stringify(event));
+  const eventJSON = guaranteeEventJSON(event);
 
   const hipchat = new HipChatAPI(lib.dbManager, lib.logger);
 
-  applyJWTValidationIfRequired(endpoint, event).then(
-    oauthData => callEndpointHandler(endpoint, [lib, hipchat, event, oauthData]).then(
+  applyJWTValidationIfRequired(endpoint, eventJSON).then(
+    oauthData => callEndpointHandler(endpoint, [lib, hipchat, eventJSON, oauthData]).then(
       res => cb(null, res),
       err => handleError(err, cb)
     ),

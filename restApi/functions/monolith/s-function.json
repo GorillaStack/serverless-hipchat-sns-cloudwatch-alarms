@@ -1,7 +1,7 @@
 {
   "name": "monolith",
   "runtime": "nodejs4.3",
-  "description": "Serverless Lambda function for project: serverless-hipchat-connect",
+  "description": "Serverless Lambda function for project: serverless-hipchat-sns-cloudwatch-alarms",
   "customName": false,
   "customRole": false,
   "handler": "functions/monolith/handler.handler",
